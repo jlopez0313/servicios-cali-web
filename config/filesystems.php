@@ -47,6 +47,30 @@ return [
             'report' => false,
         ],
 
+        'uploads_categorias' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'uploads_subcategorias' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'uploads_servicios' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -75,6 +99,9 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
+        public_path('uploads_categorias') => storage_path('app/uploads_categorias'),
+        public_path('uploads_subcategorias') => storage_path('app/uploads_subcategorias'),
+        public_path('uploads_servicios') => storage_path('app/uploads_servicios'),
     ],
 
 ];

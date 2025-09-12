@@ -4,6 +4,11 @@
 /public/build
 /public/hot
 /public/storage
+
+public/uploads_categorias/
+public/uploads_servicios/
+public/uploads_subcategorias/
+
 /resources/js/actions
 /resources/js/routes
 /resources/js/wayfinder

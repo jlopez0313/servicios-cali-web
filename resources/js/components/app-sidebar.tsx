@@ -1,3 +1,7 @@
+import { index as categorias } from '@/actions/App/Http/Controllers/CategoriasController';
+import { index as servicios } from '@/actions/App/Http/Controllers/ServiciosController';
+import { index as subcategorias } from '@/actions/App/Http/Controllers/SubcategoriasController';
+import { index as usuarios } from '@/actions/App/Http/Controllers/UsuariosController';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -5,7 +9,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Users } from 'lucide-react';
+import { Briefcase, LayoutGrid, Tag, Tags, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -16,9 +20,27 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Usuarios',
-        href: '/usuarios',
+        href: usuarios(),
         roles:['admin'],
         icon: Users,
+    },
+    {
+        title: 'Categorias',
+        href: categorias(),
+        roles:['admin'],
+        icon: Tag,
+    },
+    {
+        title: 'Subcategorias',
+        href: subcategorias(),
+        roles:['admin'],
+        icon: Tags,
+    },
+    {
+        title: 'Servicios',
+        href: servicios(),
+        roles:['admin'],
+        icon: Briefcase,
     },
 ];
 

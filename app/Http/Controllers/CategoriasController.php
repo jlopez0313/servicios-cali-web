@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\UserRole;
-use App\Http\Resources\UsuariosResource;
-use App\Models\User;
+use App\Http\Resources\CategoriasResource;
+use App\Models\Categorias;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as Peticion;
 use Inertia\Inertia;
@@ -19,7 +18,7 @@ class CategoriasController extends Controller
         $query = Categorias::orderBy('categoria');
 
         if ($request->filled('search')) {
-            $q->where('categoria', 'like', '%'.$request->search.'%');
+            $query->where('categoria', 'like', '%'.$request->search.'%');
         }
 
         return Inertia::render('Categorias/Index', [

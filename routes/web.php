@@ -26,6 +26,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/', [App\Http\Controllers\CategoriasController::class, 'index'])
                     ->name('categorias');
             });
+
+            Route::prefix('subcategorias')
+            ->group(function () {
+                Route::get('/', [App\Http\Controllers\SubcategoriasController::class, 'index'])
+                    ->name('subcategorias');
+            });
+
+            Route::prefix('servicios')
+            ->group(function () {
+                Route::get('/', [App\Http\Controllers\ServiciosController::class, 'index'])
+                    ->name('servicios');
+            });
         }
     );
 });

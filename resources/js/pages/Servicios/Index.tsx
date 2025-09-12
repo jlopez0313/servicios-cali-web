@@ -9,7 +9,7 @@ import { Pagination } from '@/components/ui/Table/Pagination';
 import { Table } from '@/components/ui/Table/Table';
 import AppLayout from '@/layouts/app-layout';
 import { confirmDialog, showAlert } from '@/plugins/sweetalert';
-import { destroy } from '@/routes/usuarios';
+import { destroy } from '@/routes/servicios';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Edit3, Trash2 } from 'lucide-react';
@@ -17,8 +17,8 @@ import { Form } from './Form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Usuarios',
-        href: '/usuarios',
+        title: 'Servicios',
+        href: '/servicios',
     },
 ];
 
@@ -36,10 +36,10 @@ export default ({ auth, filters, lista, roles }: any) => {
         const _list = data.map((item: any) => {
             return {
                 id: item.id,
-                usuario: item.name ?? '-',
-                rol: item.roles.join(', ') ?? '-',
-                email: item.email ?? '-',
-                cuenta: item.has_paid == '1' ? 'Premium' : 'Gratuita',
+                categoria: item.subcategoria?.categoria?.categoria ?? '-',
+                subcategoria: item.subcategoria?.subcategoria ?? '-',
+                servicio: item.servicio ?? '-',
+                imagen: <img src={`/${item.imagen}`} style={{maxHeight: '50px'}} />,
             };
         });
 
@@ -96,10 +96,10 @@ export default ({ auth, filters, lista, roles }: any) => {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Usuarios" />
+            <Head title="Servicios" />
 
             <div className="flex items-end justify-between px-4 pt-4">
-                <Search filters={filters} ruta="usuarios" />
+                <Search filters={filters} ruta="servicios" />
                 <Button className="ms-4" onClick={() => onToggleModal(true)}>
                     Agregar
                 </Button>
@@ -109,7 +109,7 @@ export default ({ auth, filters, lista, roles }: any) => {
                 <Table
                     user={auth.user}
                     data={list}
-                    titles={['Usuario', 'Rol', 'Email', 'Cuenta']}
+                    titles={['Categoría', 'SubCategoría', 'Servicio',  'Imágen']}
                     actions={[
                         {
                             icon: Edit3,
@@ -126,7 +126,7 @@ export default ({ auth, filters, lista, roles }: any) => {
             </div>
 
             <Pagination links={links} />
-            <Modal show={show} closeable={true} title="Gestionar Usuarios">
+            <Modal show={show} closeable={true} title="Gestionar Servicios">
                 <Form roles={roles} setIsOpen={onToggleModal} onReload={onReload} id={id} />
             </Modal>
         </AppLayout>
