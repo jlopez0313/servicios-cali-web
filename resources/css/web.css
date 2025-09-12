@@ -1,0 +1,7 @@
+:root {
+    --color-sidebar-accent: oklch(0.94 0 0);
+}
+
+#app {
+    height: 100%;
+}

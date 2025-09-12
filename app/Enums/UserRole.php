@@ -5,9 +5,8 @@ namespace App\Enums;
 enum UserRole: string
 {
     case ADMIN = 'admin';
-    case LIDER = 'lider';
-    case COLABORADOR = 'colaborador';
-    case USER = 'usuario';
+    case PROVEEDOR = 'proveedor';
+    case CLIENTE = 'cliente';
     
     public static function values(): array
     {
@@ -18,9 +17,8 @@ enum UserRole: string
     {
         return match(strtolower($name)) {
             'admin' => self::ADMIN,
-            'lider' => self::LIDER,
-            'usuario' => self::USER,
-            'colaborador' => self::COLABORADOR,
+            'proveedor' => self::PROVEEDOR,
+            'cliente' => self::CLIENTE,
             default => throw new \ValueError("$name no es un valor válido")
         };
     }

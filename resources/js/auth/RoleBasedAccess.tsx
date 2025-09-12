@@ -1,20 +1,10 @@
 import { usePage } from '@inertiajs/react';
 
-export default function RoleCheck({ children, role }: any) {
+export default function RoleCheck({ children, roles }: any) {
     const { auth }: any = usePage().props;
 
-    if ( role ) {
-        if ( !auth.user || !auth.user.role ) {
-            return null;
-        } else if(typeof role == 'string') {
-            if ( auth.user.role !== role ) {
-                return null;
-            }
-        } else if(typeof role == 'object') {
-            if ( !role.includes(auth.user.role) ) {
-                return null;
-            }
-        }
+    if (roles && !auth.user.roles.some((r: string) => roles.includes(r))) {
+        return null;
     }
 
     return children;

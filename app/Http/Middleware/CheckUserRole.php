@@ -9,9 +9,11 @@ use App\Enums\UserRole;
 
 class CheckUserRole
 {
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!$request->user() || !$request->user()->hasRole($role)) {
+        $user = $request->user();
+        
+        if (!$user || !$user->hasAnyRole($roles)) {
             abort(403, 'Acceso no autorizado');
         }
         

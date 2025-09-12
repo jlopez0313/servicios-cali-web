@@ -20,7 +20,7 @@ export const NavMenuItem = ({
     return (
         <SidebarMenu>
             {items.map((item, idx) => (
-                <RoleCheck key={idx} role={item.role}>
+                <RoleCheck key={idx} roles={item.roles}>
                     {item.children ? (
                         <NavMenuSubItem key={item.title} item={item} />
                     ) : (

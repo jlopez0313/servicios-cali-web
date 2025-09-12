@@ -3,11 +3,11 @@ import { usePage } from '@inertiajs/react';
 export const useRole = () => {
     const { auth }: any = usePage().props;
 
-    const hasRoles = (role: any) => {
-        if (!auth.user || !auth.user.role) {
+    const hasRoles = (roles: any) => {
+        if (!auth.user || !auth.user.roles.length) {
             return null;
         } else {
-            return role.some((r: string) => r == auth.user.role);
+            return auth.user.roles.some((r: string) => roles.includes(r));
         }
     }
 
