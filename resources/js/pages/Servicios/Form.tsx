@@ -10,12 +10,17 @@ import { categoria as byCategoria } from '@/routes/subcategorias';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import styles from './Servicios.module.scss';
 
 type ThisForm = {
     categorias_id: string;
     subcategorias_id: string;
     servicio: string;
     url: string;
+    whatsapp: string | undefined;
+    precio: string;
     descripcion: string;
     imagen: string;
 };
@@ -26,6 +31,8 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
         subcategorias_id: '',
         servicio: '',
         url: '',
+        whatsapp: '',
+        precio: '',
         descripcion: '',
         imagen: '',
     });
@@ -84,6 +91,8 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
             subcategorias_id: item.subcategoria?.id.toString() ?? '',
             servicio: item.servicio,
             url: item.url,
+            whatsapp: item.whatsapp,
+            precio: item.precio,
             descripcion: item.descripcion,
             imagen: '',
         });
@@ -115,7 +124,7 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
         <div className="pt-6 pb-12">
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <form onSubmit={submit}>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                         <div>
                             <Label htmlFor="categorias_id"> Categoría </Label>
 
@@ -201,6 +210,57 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
                         </div>
 
                         <div>
+                            <Label htmlFor="url"> Link de Contacto </Label>
+
+                            <Input
+                                placeholder="Link de Contacto"
+                                id="url"
+                                type="url"
+                                name="url"
+                                value={data.url}
+                                className="mt-1 block w-full"
+                                autoComplete="url"
+                                onChange={(e) => setData('url', e.target.value)}
+                            />
+
+                            <InputError message={errors.url} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="whatsapp"> WhatsApp </Label>
+
+                            <PhoneInput
+                                defaultCountry={'CO'}
+                                className={`${styles.phone}`}
+                                placeholder="Teléfono"
+                                value={data.whatsapp}
+                                onChange={(e) => setData('whatsapp', e?.toString())}
+                                initialValueFormat="national"
+                                inputFormat="NATIONAL"
+                            />
+
+                            <InputError message={errors.whatsapp} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="Precio"> Precio del Servicio </Label>
+
+                            <Input
+                                required
+                                placeholder="Precio del Servicio"
+                                id="precio"
+                                type="number"
+                                name="precio"
+                                value={data.precio}
+                                className="mt-1 block w-full"
+                                autoComplete="precio"
+                                onChange={(e) => setData('precio', e.target.value)}
+                            />
+
+                            <InputError message={errors.whatsapp} className="mt-2" />
+                        </div>
+
+                        <div className='col-span-2'>
                             <Label htmlFor="descripcion"> Descripción </Label>
 
                             <Textarea
@@ -216,24 +276,6 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
                             />
 
                             <InputError message={errors.descripcion} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <Label htmlFor="url"> Link </Label>
-
-                            <Input
-                                required
-                                placeholder="Link"
-                                id="url"
-                                type="url"
-                                name="url"
-                                value={data.url}
-                                className="mt-1 block w-full"
-                                autoComplete="url"
-                                onChange={(e) => setData('url', e.target.value)}
-                            />
-
-                            <InputError message={errors.url} className="mt-2" />
                         </div>
 
                         <div>
@@ -254,7 +296,7 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
                             <InputError message={errors.imagen} className="mt-2" />
                         </div>
 
-                        <div className="col-span-2">{preview && <img className="media preview" src={preview} alt="" />}</div>
+                        <div className="col-span-3">{preview && <img className="media preview" src={preview} alt="" />}</div>
                     </div>
 
                     <div className="mt-4 flex items-center justify-end gap-4">

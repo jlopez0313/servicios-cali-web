@@ -1,4 +1,5 @@
 import { index as categorias } from '@/actions/App/Http/Controllers/CategoriasController';
+import { index as sedes } from '@/actions/App/Http/Controllers/SedesController';
 import { index as servicios } from '@/actions/App/Http/Controllers/ServiciosController';
 import { index as subcategorias } from '@/actions/App/Http/Controllers/SubcategoriasController';
 import { index as usuarios } from '@/actions/App/Http/Controllers/UsuariosController';
@@ -9,7 +10,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Briefcase, LayoutGrid, Tag, Tags, Users } from 'lucide-react';
+import { Briefcase, LayoutGrid, Store, Tag, Tags, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -31,7 +32,13 @@ const mainNavItems: NavItem[] = [
         icon: Tag,
     },
     {
-        title: 'Subcategorias',
+        title: 'Sedes',
+        href: sedes(),
+        roles:['admin', 'proveedor'],
+        icon: Store,
+    },
+    {
+        title: 'Secciones',
         href: subcategorias(),
         roles:['admin'],
         icon: Tags,

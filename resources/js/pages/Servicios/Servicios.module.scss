@@ -1,0 +1,23 @@
+div.phone {
+    margin-top: calc(var(--spacing) * 1);
+    border-radius: var(--radius-md, calc(0.625rem - 2px));
+    border: 1px var(--tw-border-style) var(--color-input, #e5e5e5);
+    padding-block: calc(var(--spacing) * 1);
+    padding-inline: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 9);
+    
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
+
+    input {
+        font-size: var(--text-sm);
+        background: none;
+        border: none;
+        margin-left: 5px;
+
+        &:focus {
+            outline: 0;
+        }
+    }
+}

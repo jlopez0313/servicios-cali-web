@@ -12,13 +12,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::middleware(['role:admin,cliente'])
+    Route::middleware(['role:admin'])
     ->group(
         function () {
             Route::prefix('usuarios')
             ->group(function () {
                 Route::get('/', [App\Http\Controllers\UsuariosController::class, 'index'])
                     ->name('usuarios');
+            });
+
+            Route::prefix('sedes')
+            ->controller(App\Http\Controllers\SedesController::class)
+            ->group(function () {
+                Route::get('/', 'index');
+                Route::get('/crear', 'create');
+                Route::get('/editar/{sede}', 'edit');
             });
 
             Route::prefix('categorias')
@@ -37,6 +45,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->group(function () {
                 Route::get('/', [App\Http\Controllers\ServiciosController::class, 'index'])
                     ->name('servicios');
+            });
+
+            Route::controller(App\Http\Controllers\ComentariosController::class)
+            ->prefix('comentarios')
+            ->group(function () {
+                Route::get('/sedes/{id}', 'index')->defaults('type', 'sedes')->name('comentarios.sede');
+                Route::get('/productos/{id}', 'index')->defaults('type', 'productos')->name('comentarios.producto');
             });
         }
     );

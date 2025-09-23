@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { confirmDialog, showAlert } from '@/plugins/sweetalert';
 import { destroy } from '@/routes/subcategorias';
 import { BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Edit3, Trash2 } from 'lucide-react';
 import { Form } from './Form';
 
@@ -27,6 +27,8 @@ export default ({ auth, filters, lista, roles }: any) => {
         data,
         meta: { links },
     } = lista;
+
+    const currentUrl = usePage().url;
 
     const [list, setList] = useState([]);
     const [id, setId] = useState<number | null>(null);
@@ -78,15 +80,9 @@ export default ({ auth, filters, lista, roles }: any) => {
     const onReload = () => {
         onToggleModal(false);
 
-        const url = new URL(window.location.href);
-        const page = parseInt(url.searchParams.get('page') ?? '1');
-
-        if (list.length == 1 && page > 1) {
-            url.searchParams.set('page', String(page - 1));
-            router.visit(url.toString());
-        } else {
-            router.visit(window.location.pathname + window.location.search);
-        }
+        router.visit(currentUrl, {
+            preserveScroll: true,
+        });
     };
 
     useEffect(() => {

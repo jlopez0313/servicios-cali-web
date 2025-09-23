@@ -24,7 +24,9 @@ class ServiciosResource extends JsonResource
             'servicio' => $this->servicio,
             'descripcion' => $this->descripcion,
             'url' => $this->url,
+            'whatsapp' => $this->whatsapp,
             'imagen' => $this->imagen,
+            'precio' => $this->precio,
         ];
     }
 }

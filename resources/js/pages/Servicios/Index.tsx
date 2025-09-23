@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Table/Pagination';
 import { Table } from '@/components/ui/Table/Table';
+import { toCurrency } from '@/helpers/Numbers';
 import AppLayout from '@/layouts/app-layout';
 import { confirmDialog, showAlert } from '@/plugins/sweetalert';
 import { destroy } from '@/routes/servicios';
 import { BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Edit3, Trash2 } from 'lucide-react';
 import { Form } from './Form';
 
@@ -32,6 +33,8 @@ export default ({ auth, filters, lista, roles }: any) => {
     const [id, setId] = useState<number | null>(null);
     const [show, setShow] = useState(false);
 
+    const currentUrl = usePage().url;
+
     const onSetList = () => {
         const _list = data.map((item: any) => {
             return {
@@ -39,6 +42,8 @@ export default ({ auth, filters, lista, roles }: any) => {
                 categoria: item.subcategoria?.categoria?.categoria ?? '-',
                 subcategoria: item.subcategoria?.subcategoria ?? '-',
                 servicio: item.servicio ?? '-',
+                whatsapp: item.whatsapp ?? '-',
+                precio: toCurrency(item.precio ?? 0),
                 imagen: <img src={`/${item.imagen}`} style={{maxHeight: '50px'}} />,
             };
         });
@@ -79,15 +84,9 @@ export default ({ auth, filters, lista, roles }: any) => {
     const onReload = () => {
         onToggleModal(false);
 
-        const url = new URL(window.location.href);
-        const page = parseInt(url.searchParams.get('page') ?? '1');
-
-        if (list.length == 1 && page > 1) {
-            url.searchParams.set('page', String(page - 1));
-            router.visit(url.toString());
-        } else {
-            router.visit(window.location.pathname + window.location.search);
-        }
+        router.visit(currentUrl, {
+            preserveScroll: true,
+        });
     };
 
     useEffect(() => {
@@ -109,7 +108,7 @@ export default ({ auth, filters, lista, roles }: any) => {
                 <Table
                     user={auth.user}
                     data={list}
-                    titles={['Categoría', 'SubCategoría', 'Servicio',  'Imágen']}
+                    titles={['Categoría', 'SubCategoría', 'Servicio', 'WhatsApp', 'Precio', 'Imágen']}
                     actions={[
                         {
                             icon: Edit3,

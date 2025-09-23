@@ -12,8 +12,10 @@ class Servicios extends Model
         'subcategorias_id',
         'servicio',
         'url',
+        'whatsapp',
         'descripcion',
         'imagen',
+        'precio',
     ];
 
     public function subcategoria() {

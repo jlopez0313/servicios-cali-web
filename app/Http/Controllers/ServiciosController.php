@@ -21,6 +21,8 @@ class ServiciosController extends Controller
         if ($request->filled('search')) {
             $query->where(function($q) use ($request){
                 $q->where('servicio', 'like', '%'.$request->search.'%')
+                    ->orWhere('whastapp', 'like', '%'.$request->search.'%')
+                    ->orWhere('precio', 'like', '%'.$request->search.'%')
                     ->orWhereHas('subcategoria', function ($q2) use ($request) {
                         $q2->where(function($q3) use ($request){
                             $q3->where('subcategoria', 'like', '%'.$request->search.'%')

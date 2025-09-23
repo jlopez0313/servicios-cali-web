@@ -16,7 +16,7 @@ type ThisForm = {
     repeated_password?: string;
 };
 
-export const Form = ({ id, roles, setIsOpen, onReload }: any) => {
+export const Form = ({ id, roles, setIsOpen, processing, onStore, onGetItem, onReload }: any) => {
     const { data, setData, errors, reset, setError } = useForm<ThisForm>({
         name: '',
         email: '',
@@ -25,7 +25,6 @@ export const Form = ({ id, roles, setIsOpen, onReload }: any) => {
         repeated_password: '',
     });
 
-    const [processing, setProcessing] = useState(false);
     const [resetKey, setResetKey] = useState(Date.now());
 
     const submit: FormEventHandler = async (e) => {
@@ -41,41 +40,31 @@ export const Form = ({ id, roles, setIsOpen, onReload }: any) => {
         }
 
         if (!data.role.length) {
-            setError("role", "Debes seleccionar al menos un rol");
+            setError('role', 'Debes seleccionar al menos un rol');
             return;
         }
 
-        setProcessing(true);
-
-        try {
-            if (id) {
-                await axios.put(update({ id }).url, data);
-            } else {
-                await axios.post(store().url, data);
-            }
-            setProcessing(false);
-            onReload();
-        } catch (error) {
-            setProcessing(false);
-        }
-    };
-
-    const onGetItem = async () => {
-        const { data } = await axios.get(show({ id }).url);
-        const item = { ...data.data };
-
-        setData({
-            name: item.name,
-            email: item.email,
-            role: item.roles || [],
-        });
-
-        setResetKey(Date.now());
+        await onStore(store, update, data);
+        onReload();
     };
 
     useEffect(() => {
-        id && onGetItem();
-    }, []);
+        const getItem = async () => {
+            if (!id) return;
+            const item: any = await onGetItem(show, { id });
+
+            if (item) {
+                setData({
+                    name: item.name,
+                    email: item.email,
+                    role: item.roles || [],
+                });
+
+                setResetKey(Date.now());
+            }
+        };
+        getItem();
+    }, [id]);
 
     return (
         <div className="pt-6 pb-12">

@@ -12,14 +12,13 @@ type ThisForm = {
     imagen: string;
 };
 
-export const Form = ({ id, setIsOpen, onReload }: any) => {
+export const Form = ({ id, setIsOpen, onReload, processing, onStore, onGetItem }: any) => {
     const { data, setData, errors, reset, setError } = useForm<ThisForm>({
         categoria: '',
         imagen: '',
     });
 
     const [preview, setPreview] = useState('');
-    const [processing, setProcessing] = useState(false);
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -29,32 +28,8 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
             formData.append(key, data[key]);
         });
 
-        setProcessing(true);
-
-        try {
-            if (id) {
-                formData.append("_method", "PUT");
-                await axios.post(update({ id }).url, formData);
-            } else {
-                await axios.post(store().url, formData);
-            }
-            setProcessing(false);
-            onReload();
-        } catch (error) {
-            setProcessing(false);
-        }
-    };
-
-    const onGetItem = async () => {
-        const { data } = await axios.get(show({ categoria: id }).url);
-        const item = { ...data.data };
-
-        setData({
-            categoria: item.categoria,
-            imagen: '',
-        });
-
-        setPreview(item.imagen);
+        await onStore(store, update, formData, true);
+        onReload();
     };
 
     const onSetPreview = (evt: any) => {
@@ -68,8 +43,22 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
     };
 
     useEffect(() => {
-        id && onGetItem();
-    }, []);
+        const getItem = async () => {
+            if (!id) return;
+            const item = await onGetItem(show, { categoria: id });
+
+            if (item) {
+                setData({
+                    categoria: item.categoria,
+                    imagen: '',
+                });
+
+                setPreview(item.imagen);
+            }
+        };
+
+        getItem();
+    }, [id]);
 
     return (
         <div className="pt-6 pb-12">
@@ -105,7 +94,7 @@ export const Form = ({ id, setIsOpen, onReload }: any) => {
                                 name="imagen"
                                 className="mt-1 block w-full"
                                 autoComplete="imagen"
-                                accept='image/*'
+                                accept="image/*"
                                 onChange={onSetPreview}
                             />
 

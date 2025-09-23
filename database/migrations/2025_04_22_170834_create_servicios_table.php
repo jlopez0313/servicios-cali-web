@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('subcategorias_id')->constrained('subcategorias');
             $table->string('servicio');
-            $table->string('url');
+            $table->string('url')->nullable();
+            $table->string('whatsapp')->nullable();
             $table->text('descripcion');
             $table->string('imagen');
+            $table->string('precio');
             $table->timestamps();
             $table->softDeletes();
         });
