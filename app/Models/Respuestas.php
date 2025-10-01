@@ -14,6 +14,6 @@ class Respuestas extends Model
 
     public function comentario()
     {
-        return $this->belongsTo(Comentarios::class, 'sedes_id', 'id');
+        return $this->belongsTo(Comentarios::class, 'comentarios_id', 'id');
     }
 }

@@ -11,4 +11,14 @@ class RedesSociales extends Model
 
     protected $table = 'redes_sociales';
     protected $guarded = [];
+
+    public function sede()
+    {
+        return $this->belongsTo(Sedes::class, 'sedes_id', 'id');
+    }
+    
+    public function comercio()
+    {
+        return $this->belongsTo(Comercios::class, 'comercios_id', 'id');
+    }
 }

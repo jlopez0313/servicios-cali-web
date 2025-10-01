@@ -1,14 +1,14 @@
+import OSMDraggableMap from '@/components/Map/OSMDraggableMap';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MultiSelect } from '@/components/ui/multiselect';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import StarRating from '@/components/ui/StarRating';
 import { useCrudPage } from '@/hooks/useCrudPage';
 import { cn } from '@/lib/utils';
 import { showAlert } from '@/plugins/sweetalert';
-import { index } from '@/routes/categorias';
 import { index as Cities } from '@/routes/cities';
+import { index as Comercios } from '@/routes/comercios';
 import { index as Countries } from '@/routes/countries';
 import { show, store, update } from '@/routes/sedes';
 import { index as States } from '@/routes/states';
@@ -19,15 +19,14 @@ import { E164Number } from 'node_modules/libphonenumber-js/types';
 import { FormEventHandler, useEffect, useMemo, useState } from 'react';
 import PhoneInput, { Country, parsePhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import OSMDraggableMap from './OSMDraggableMap';
 
 type ThisForm = {
     paises_id: string;
     departamentos_id: string;
     ciudades_id: string;
+    comercios_id: string;
     sede: string;
     direccion: string;
-    categorias: string[];
     latitud: number;
     longitud: number;
     estrellas: number;
@@ -35,6 +34,7 @@ type ThisForm = {
     numero: string | undefined;
     phone: E164Number | undefined;
     country: string | undefined;
+    estado: string;
 };
 
 const latitude = 3.450965;
@@ -45,9 +45,9 @@ export const Informacion = ({ sedeId }: any) => {
         paises_id: '',
         departamentos_id: '',
         ciudades_id: '',
+        comercios_id: '',
         sede: '',
         direccion: '',
-        categorias: [],
         latitud: latitude,
         longitud: longitude,
         estrellas: 0,
@@ -55,15 +55,17 @@ export const Informacion = ({ sedeId }: any) => {
         numero: '',
         phone: undefined,
         country: '',
+        estado: '',
     });
 
     const [resetKey, setResetKey] = useState(Date.now());
     const { id, processing, onStore, onBack, onGetItem } = useCrudPage(null, null, sedeId);
 
+    const [estados, setEstados] = useState<any[]>([]);
     const [paises, setPaises] = useState<any[]>([]);
     const [departamentos, setDepartamentos] = useState<any[]>([]);
     const [ciudades, setCiudades] = useState<any[]>([]);
-    const [categorias, setCategorias] = useState([]);
+    const [comercios, setComercios] = useState<any[]>([]);
 
     const handlePhoneChange = (value: E164Number | undefined) => {
         setData('phone', value);
@@ -87,7 +89,12 @@ export const Informacion = ({ sedeId }: any) => {
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
 
-        onStore(store, update, data);
+        try {
+            onStore(store, update, data);
+        } catch (error) {
+            console.error(error)
+            showAlert('error', 'No se pudieron registrar algunos datos')
+        }
     };
 
     const initialPos = useMemo(() => {
@@ -102,16 +109,20 @@ export const Informacion = ({ sedeId }: any) => {
                         data: { data: paises },
                     },
                     {
-                        data: { data: categorias },
+                        data: { data: comercios },
                     },
-                ] = await axios.all([axios.get(Countries({ prefix: 'api' }, { query: { fields: 'iso2, phone_code' } }).url), axios.get(index().url)]);
+                    {
+                        data: constantes,
+                    },
+                ] = await axios.all([
+                    axios.get(Countries({ prefix: 'api' }, { query: { fields: 'iso2, phone_code' } }).url), 
+                    axios.get(Comercios().url),
+                    axios.get('/api/constants'),
+                ]);
 
                 setPaises(paises ?? []);
-                setCategorias(
-                    categorias.map((cat: any) => {
-                        return { label: cat.categoria, value: cat.id };
-                    }) ?? [],
-                );
+                setComercios(comercios ?? []);
+                setEstados(constantes.estados ?? []);
             } catch (error) {
                 console.error('Error fetching data:', error);
                 showAlert('error', 'No se pudieron cargar algunos datos');
@@ -126,7 +137,10 @@ export const Informacion = ({ sedeId }: any) => {
             if (!data.paises_id) return;
             try {
                 const country = paises.find((p) => p.id == data.paises_id);
-                setData('country', country.iso2);
+
+                if (country) {
+                    setData('country', country.iso2);
+                }
 
                 const {
                     data: { data: lista },
@@ -158,7 +172,7 @@ export const Informacion = ({ sedeId }: any) => {
         };
 
         getData();
-    }, [data.departamentos_id]);
+    }, [paises, data.departamentos_id]);
 
     useEffect(() => {
         const getItem = async () => {
@@ -167,13 +181,10 @@ export const Informacion = ({ sedeId }: any) => {
             const item = await onGetItem(show, { id: sedeId });
 
             setData({
-                categorias:
-                    item.categorias.map((cat: any) => {
-                        return cat.id;
-                    }) || [],
                 paises_id: item.ciudad?.state?.country_id.toString() ?? '',
                 departamentos_id: item.ciudad?.state_id.toString() ?? '',
                 ciudades_id: item.ciudad?.id.toString() ?? '',
+                comercios_id: item.comercio?.id.toString() ?? '',
                 sede: item.sede ?? '',
                 direccion: item.direccion ?? '',
                 latitud: Number(item.latitud) || latitude,
@@ -183,6 +194,7 @@ export const Informacion = ({ sedeId }: any) => {
                 country: item.ciudad?.state?.country.iso2,
                 numero: item.numero,
                 phone: `+${item.ciudad?.state?.country.phone_code}${item.numero}`,
+                estado: item.estado,
             });
 
             setResetKey(Date.now());
@@ -212,7 +224,7 @@ export const Informacion = ({ sedeId }: any) => {
                                     align="start"
                                     side="bottom"
                                     sideOffset={3}
-                                    className="rounded-md border border-gray-300 bg-white p-1 shadow-md"
+                                    className="z-[9999] rounded-md border border-gray-300 bg-white p-1 shadow-md"
                                 >
                                     {paises.map((item: any, idx: number) => {
                                         return (
@@ -244,7 +256,7 @@ export const Informacion = ({ sedeId }: any) => {
                                     align="start"
                                     side="bottom"
                                     sideOffset={3}
-                                    className="rounded-md border border-gray-300 bg-white p-1 shadow-md"
+                                    className="z-[9999] rounded-md border border-gray-300 bg-white p-1 shadow-md"
                                 >
                                     {departamentos.map((item: any, idx: number) => {
                                         return (
@@ -276,7 +288,7 @@ export const Informacion = ({ sedeId }: any) => {
                                     align="start"
                                     side="bottom"
                                     sideOffset={3}
-                                    className="rounded-md border border-gray-300 bg-white p-1 shadow-md"
+                                    className="z-[9999] rounded-md border border-gray-300 bg-white p-1 shadow-md"
                                 >
                                     {ciudades.map((item: any, idx: number) => {
                                         return (
@@ -293,7 +305,39 @@ export const Informacion = ({ sedeId }: any) => {
                         </div>
 
                         <div>
-                            <Label htmlFor="sede"> Nombre </Label>
+                            <Label htmlFor="comercios_id"> Comercio </Label>
+
+                            <Select
+                                key={`comercios_id-${resetKey}`}
+                                defaultValue={data.comercios_id}
+                                onValueChange={(value) => (value ? setData('comercios_id', value) : null)}
+                            >
+                                <SelectTrigger className="flex w-full justify-start rounded-md border border-gray-300 px-3 py-2 text-sm">
+                                    <SelectValue placeholder="Selecciona un valor" />
+                                </SelectTrigger>
+                                <SelectContent
+                                    position="popper"
+                                    align="start"
+                                    side="bottom"
+                                    sideOffset={3}
+                                    className="z-[9999] rounded-md border border-gray-300 bg-white p-1 shadow-md"
+                                >
+                                    {comercios.map((item: any, idx: number) => {
+                                        return (
+                                            <SelectItem key={idx} value={`${item.id.toString()}`}>
+                                                {' '}
+                                                {item.nombre}{' '}
+                                            </SelectItem>
+                                        );
+                                    })}
+                                </SelectContent>
+                            </Select>
+
+                            {errors.comercios_id && <p className="mt-1 text-sm text-red-500">{errors.comercios_id}</p>}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="sede"> Nombre de la Sede </Label>
 
                             <Input
                                 autoFocus
@@ -301,7 +345,7 @@ export const Informacion = ({ sedeId }: any) => {
                                 name="sede"
                                 required
                                 value={data.sede}
-                                placeholder="Nombre"
+                                placeholder="Nombre de la Sede"
                                 onChange={(e) => setData('sede', e.target.value)}
                             />
 
@@ -345,15 +389,35 @@ export const Informacion = ({ sedeId }: any) => {
                         </div>
 
                         <div>
-                            <Label htmlFor="categorias"> Categorías </Label>
-                            <MultiSelect
-                                placeholder="Selecciona Categorías"
-                                selected={data.categorias}
-                                onChange={(newSelected) => setData('categorias', newSelected)}
-                                options={categorias}
-                            />
+                            <Label htmlFor="estado"> Estado </Label>
 
-                            {errors.categorias && <p className="mt-1 text-sm text-red-500">{errors.categorias}</p>}
+                            <Select
+                                key={`estado-${resetKey}`}
+                                defaultValue={data.estado}
+                                onValueChange={(value) => (value ? setData('estado', value) : null)}
+                            >
+                                <SelectTrigger className="flex w-full justify-start rounded-md border border-gray-300 px-3 py-2 text-sm">
+                                    <SelectValue placeholder="Selecciona un valor" />
+                                </SelectTrigger>
+                                <SelectContent
+                                    position="popper"
+                                    align="start"
+                                    side="bottom"
+                                    sideOffset={3}
+                                    className="z-[9999] rounded-md border border-gray-300 bg-white p-1 shadow-md"
+                                >
+                                    {estados.map((item: any, idx: number) => {
+                                        return (
+                                            <SelectItem key={idx} value={`${item.key}`}>
+                                                {' '}
+                                                {item.valor}{' '}
+                                            </SelectItem>
+                                        );
+                                    })}
+                                </SelectContent>
+                            </Select>
+
+                            {errors.estado && <p className="mt-1 text-sm text-red-500">{errors.estado}</p>}
                         </div>
 
                         {sedeId && (
@@ -389,10 +453,9 @@ export const Informacion = ({ sedeId }: any) => {
                         </div>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-end">
+                    <div className="mt-4 flex items-center justify-end gap-4">
                         <Button
                             variant={'outline'}
-                            className="mx-4 ms-4"
                             disabled={processing}
                             type="button"
                             onClick={() => {

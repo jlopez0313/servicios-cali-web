@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { showAlert } from '@/plugins/sweetalert';
 import { show, store, update } from '@/routes/redes';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
@@ -26,7 +27,10 @@ export const Form = ({ sedeId, redId, onLoad, onClose, processing, onStore, onGe
             await onStore(store, update, data);
             onClose();
             onLoad();
-        } catch (error) {}
+        } catch (error) {
+            console.error(error)
+            showAlert('error', 'No se pudieron registrar algunos datos')
+        }
     };
 
     useEffect(() => {

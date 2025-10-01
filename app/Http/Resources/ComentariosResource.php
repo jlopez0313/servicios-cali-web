@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SubcategoriasResource extends JsonResource
+class ComentariosResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,10 +20,13 @@ class SubcategoriasResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'usuario' => $this->usuario,
-            'categoria' => $this->categoria,
-            'subcategoria' => $this->subcategoria,
-            'imagen' => $this->imagen,
+            'servicio' => $this->servicio,
+            'cliente' => $this->cliente,
+            'comentario' => $this->comentario,
+            'respuesta' => $this->respuesta,
+            'rating' => $this->rating,
+            'aprobado' => $this->aprobado,
+            'created_at' => $this->created_at,
         ];
     }
 }

@@ -32,14 +32,22 @@ class ServiciosController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('imagen');
+        try {
+            $data = $request->except('imagen', 'secciones_id');
+    
+            $compressedImage = $this->imageCompressionService->compressImage($request->imagen, 'app/uploads_servicios/');
+            $data['imagen'] = $compressedImage;
+    
+            $data['en_sede'] = $request->boolean('en_sede') == true ? 1 : 0;
+            $data['a_domicilio'] = $request->boolean('a_domicilio') == true ? 1 : 0;
 
-        $compressedImage = $this->imageCompressionService->compressImage($request->imagen, 'app/uploads_servicios/');
-        $data['imagen'] = $compressedImage;
-
-        $servicio = Servicios::create($data);
-
-        return new ServiciosResource($servicio);
+            $servicio = Servicios::create($data);
+            $servicio->secciones()->sync($request->secciones_id ?? []);
+    
+            return new ServiciosResource($servicio);
+        } catch (\Exception $ex) {
+            return response()->json([$ex->getMessage()], 400);
+        }
     }
 
     /**
@@ -47,7 +55,7 @@ class ServiciosController extends Controller
      */
     public function show(Servicios $servicio)
     {
-        $servicio->load('subcategoria.categoria');
+        $servicio->load('secciones', 'sede.comercio', 'sede.ciudad.state.country');
         return new ServiciosResource($servicio);
     }
 
@@ -57,20 +65,28 @@ class ServiciosController extends Controller
     public function update(Request $request, Servicios $servicio)
     {
         try {
-            $data = $request->except('imagen');
+            $data = $request->except('imagen', 'secciones_id');
 
             if (isset($request->imagen) ) {
-                \Storage::disk('uploads_servicios')->delete($servicio->imagen);
+                
+                if ($seccion->imagen) {
+                    \Storage::disk('uploads_servicios')->delete($servicio->imagen);
+                }
 
                 $compressedImage = $this->imageCompressionService->compressImage($request->imagen, 'app/uploads_servicios/');
                 $data['imagen'] = $compressedImage;
             }
 
+            $data['es_virtual'] = $request->boolean('es_virtual') == true ? 1 : 0;
+            $data['en_sede'] = $request->boolean('en_sede') == true ? 1 : 0;
+            $data['a_domicilio'] = $request->boolean('a_domicilio') == true ? 1 : 0;
+
             $servicio->update($data);
+            $servicio->secciones()->sync($request->secciones_id ?? []);
 
             return new ServiciosResource($servicio);
         } catch (\Exception $ex) {
-            return $ex->getMessage();
+            return response()->json([$ex->getMessage()], 400);
         }
     }
 
@@ -79,7 +95,9 @@ class ServiciosController extends Controller
      */
     public function destroy(Servicios $servicio)
     {
-        \Storage::disk('uploads_servicios')->delete($servicio->imagen);
+        if ($seccion->imagen) {
+            \Storage::disk('uploads_servicios')->delete($servicio->imagen);
+        }
 
         $servicio->delete();
 

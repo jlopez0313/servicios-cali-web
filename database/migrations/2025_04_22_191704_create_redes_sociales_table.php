@@ -12,7 +12,8 @@ return new class extends Migration {
     {
         Schema::create('redes_sociales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sedes_id')->constrained('sedes');
+            $table->foreignId('comercios_id')->nullable()->constrained('comercios');
+            $table->foreignId('sedes_id')->nullable()->constrained('sedes');
 
             $table->string('nombre');
             $table->string('url');

@@ -3,33 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Comercios;
+use App\Http\Resources\ComentariosResource;
 use App\Models\Comentarios;
+use Illuminate\Http\Request;
 
 class ComentariosController extends Controller
 {
     /**
-    * NOA\Get(
-    *     path="/comentarios",
-    *     summary="Lista de comentarios",
-    *     tags={"Comentarios"},
-    *     security={{"bearerAuth":{}}},
-    *     NOA\Response(
-    *         response=200,
-    *         description="OK"
-    *     )
-    * )
-    */
+     * Display the resources.
+     */
     public function index()
     {
-        $comentarios = Comentarios::all();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'OK',
-            'data' => $comentarios,
-        ]);
+        return ComentariosResource::collection(Comentarios::all());
     }
 
     /**
@@ -37,50 +22,23 @@ class ComentariosController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
-    * @OA\Post(
-    *   path="/comentarios",
-    *   summary="Crear un comentario o calificacion para un comercio o un producto",
-    *   tags={"Comentarios"},
-    *   @OA\RequestBody(
-    *       required=true,
-    *       request="request",
-    *       @OA\JsonContent(
-    *           required={"nombre", "fecha", "rating"},
-    *           @OA\Property(property="comercios_id", type="number", example="1", nullable=true),
-    *           @OA\Property(property="productos_id", type="number", example="1", nullable=true),
-    *           @OA\Property(property="nombre", type="string", example="Nombre de la Persona"),
-    *           @OA\Property(property="comentario", type="string", example="Texto del comentario"),
-    *           @OA\Property(property="fecha", type="string", example="2025-03-14T15:00:00Z"),
-    *           @OA\Property(property="rating", type="number", example="2")
-    *       )
-    *   ),
-    *   @OA\Response(
-    *     response=200,
-    *     description="OK"
-    *   )
-    * )
-    */
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $comentario = Comentarios::create([
-            'comercios_id' => $request->comercios_id,
-            'productos_id' => $request->productos_id,
-            'nombre' => $request->nombre,
+            'sedes_id' => $request->sedes_id,
+            'servicios_id' => $request->servicios_id,
+            'clientes_id' => \Auth::user()->id,
             'comentario' => $request->comentario,
-            'fecha' => $request->fecha,
             'rating' => $request->rating,
             'aprobado' => false,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'OK',
-            'data' => $comentario,
-        ]);
+        return new ComentariosResource($comentario);
     }
 
     /**
@@ -90,11 +48,7 @@ class ComentariosController extends Controller
     {
         $comentario = Comentarios::with('respuesta')->find($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'OK',
-            'data' => $comentario,
-        ]);
+        return new ComentariosResource($comentario);
     }
 
     /**
@@ -102,7 +56,6 @@ class ComentariosController extends Controller
      */
     public function edit(string $id)
     {
-        //
     }
 
     /**
@@ -110,16 +63,18 @@ class ComentariosController extends Controller
      */
     public function update(Request $request, Comentarios $comentario)
     {
-        $comentario->update( $request->except('respuesta') );
+        $comentario->update($request->except('respuesta'));
 
         $comentario->respuesta()->updateOrCreate(
             [
-                'comentarios_id' => $comentario->id
+                'comentarios_id' => $comentario->id,
             ],
             [
-                'respuesta' => $request->respuesta
+                'respuesta' => $request->respuesta,
             ],
         );
+
+        return new ComentariosResource($comentario);
     }
 
     /**
@@ -128,5 +83,7 @@ class ComentariosController extends Controller
     public function destroy(Comentarios $comentario)
     {
         $comentario->delete();
+
+        return new ComentariosResource($comentario);
     }
 }

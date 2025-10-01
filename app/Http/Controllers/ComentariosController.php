@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ComentariosResource;
 use App\Models\Comentarios;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request as Peticion;
 use Inertia\Inertia;
 
 class ComentariosController extends Controller
@@ -15,56 +17,24 @@ class ComentariosController extends Controller
     {
         $user = \Auth::user();
 
-        $lista = Comentarios::where($request->type.'_id', $id)
-            ->orderByDesc('created_at')
-            ->paginate();
+        $query = Comentarios::with('cliente')
+            ->where($request->type.'_id', $id)
+            ->orderByDesc('created_at');
+
+        if ($request->filled('search')) {
+            $query->where('comentario', 'like', '%'.$request->search.'%')
+                ->orWhereHas('cliente', function ($q2) use ($request) {
+                    $q2->where('name', 'like', '%'.$request->search.'%');
+                });
+        }
 
         return Inertia::render('Comentarios/Index', [
-            'lista' => $lista,
+            'filters' => Peticion::all('search', 'trashed'),
+            'lista' => ComentariosResource::collection(
+                $query->paginate()->appends($request->all())
+            ),
             'type' => $request->type,
-            'id' => $id,
+            'sedesId' => $id,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Comentarios $comentario)
-    {
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Comentarios $comentario)
-    {
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
     }
 }

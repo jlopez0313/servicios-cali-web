@@ -12,14 +12,15 @@ const Toast = Swal.mixin({
     },
 });
 
-export const showAlert = (type, message) => {
+type errorType = 'error' |'success' | 'warning'
+export const showAlert = (type: errorType, message: string) => {
     Toast.fire({
         icon: type,
         title: message,
     });
 };
 
-export const confirmDialog = (options) => {
+export const confirmDialog = (options: any) => {
     return Swal.fire({
         icon: 'question',
         showCancelButton: true,

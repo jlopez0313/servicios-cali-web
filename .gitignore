@@ -6,8 +6,10 @@
 /public/storage
 
 public/uploads_categorias/
+public/uploads_comercios/
 public/uploads_servicios/
 public/uploads_subcategorias/
+public/uploads_secciones
 
 /resources/js/actions
 /resources/js/routes

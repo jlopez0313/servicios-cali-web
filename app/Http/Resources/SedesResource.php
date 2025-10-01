@@ -20,7 +20,7 @@ class SedesResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'categorias' => $this->categorias,
+            'comercio' => $this->comercio,
             'ciudad' => $this->ciudad,
             'sede' => $this->sede,
             'direccion' => $this->direccion,
@@ -29,6 +29,8 @@ class SedesResource extends JsonResource
             'estrellas' => $this->estrellas,
             'rating_precios' => $this->rating_precios,
             'numero' => $this->numero,
+            'estado' => $this->estado,
+            'estado_label' => $this->estado_label,
         ];
     }
 }

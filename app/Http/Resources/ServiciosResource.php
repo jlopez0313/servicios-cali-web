@@ -20,13 +20,18 @@ class ServiciosResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'subcategoria' => $this->subcategoria,
+            'sede' => $this->sede,
+            'secciones' => $this->secciones,
             'servicio' => $this->servicio,
             'descripcion' => $this->descripcion,
             'url' => $this->url,
             'whatsapp' => $this->whatsapp,
             'imagen' => $this->imagen,
             'precio' => $this->precio,
+            'es_virtual' => $this->es_virtual,
+            'a_domicilio' => $this->a_domicilio,
+            'en_sede' => $this->en_sede,
+            'precio_domicilio' => $this->precio_domicilio,
         ];
     }
 }

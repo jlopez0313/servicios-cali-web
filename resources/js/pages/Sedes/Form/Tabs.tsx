@@ -1,6 +1,7 @@
+import { index } from '@/actions/App/Http/Controllers/ServiciosController';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { producto, sede } from '@/routes/comentarios';
+import { sede } from '@/routes/comentarios';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Horarios } from './Horarios/Horarios';
@@ -23,8 +24,8 @@ export default function ({ id }: any) {
         router.visit(sede({ id }));
     };
 
-    const goToProductos = () => {
-        router.visit(producto(id));
+    const goToServicios = () => {
+        router.visit(index(id));
     };
 
     return (
@@ -41,6 +42,9 @@ export default function ({ id }: any) {
                     </TabsTrigger>
                     <TabsTrigger value="redes" className="flex-1">
                         Redes Sociales
+                    </TabsTrigger>
+                    <TabsTrigger value="servicios" className="flex-1" onClick={goToServicios}>
+                        Servicios
                     </TabsTrigger>
                     <TabsTrigger value="comentarios" className="flex-1" onClick={goToComments}>
                         Comentarios

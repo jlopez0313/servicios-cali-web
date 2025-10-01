@@ -15,7 +15,7 @@ class SedesController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Sedes::with('ciudad.state.country', 'categorias')
+        $query = Sedes::with('ciudad.state.country', 'comercio')
             ->forCurrentUser();
 
         if ($request->filled('search')) {
@@ -32,8 +32,8 @@ class SedesController extends Controller
                         });
                     });
                 })
-                ->orWhereHas('categorias', function ($q2) use ($request) {
-                    $q2->where('categoria', 'like', '%'.$request->search.'%');
+                ->orWhereHas('comercio', function ($q2) use ($request) {
+                    $q2->where('nombre', 'like', '%'.$request->search.'%');
                 });
             });
         }
@@ -55,20 +55,6 @@ class SedesController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
@@ -76,19 +62,5 @@ class SedesController extends Controller
         return Inertia::render('Sedes/Form/Tabs', [
             'id' => $id,
         ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
     }
 }

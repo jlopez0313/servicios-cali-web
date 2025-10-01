@@ -4,20 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Subcategorias extends Model
+class Secciones extends Model
 {
-    protected $table = 'subcategorias';
+    protected $table = 'secciones';
 
     protected $fillable = [
         'usuarios_id',
-        'subcategorias_id',
-        'subcategoria',
+        'seccion',
         'imagen',
     ];
-
-    public function categoria() {
-        return $this->belongsTo(Categorias::class, 'categorias_id', 'id');
-    }
 
     public function usuario() {
         return $this->belongsTo(User::class, 'usuarios_id', 'id');

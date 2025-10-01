@@ -12,18 +12,27 @@ class Comentarios extends Model
     protected $table = 'comentarios';
     protected $guarded = [];
 
+    protected $casts = [
+        'created_at' => 'date',
+    ];
+
     public function respuesta()
     {
         return $this->hasOne(Respuestas::class, 'comentarios_id', 'id');
     }
 
-    public function producto()
+    public function servicio()
     {
-        return $this->belongsTo(Productos::class, 'productos_id', 'id');
+        return $this->belongsTo(Servicios::class, 'servicios_id', 'id');
     }
 
     public function sede()
     {
-        return $this->belongsTo(sedes::class, 'sedes_id', 'id');
+        return $this->belongsTo(Sedes::class, 'sedes_id', 'id');
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(User::class, 'clientes_id', 'id');
     }
 }

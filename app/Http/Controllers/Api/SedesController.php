@@ -14,23 +14,9 @@ class SedesController extends Controller
      */
     public function store(Request $request)
     {
-        \DB::beginTransaction();
+        $sede = Sedes::create($request->except('paises_id', 'departamentos_id', 'estrellas', 'rating_precios'));
 
-        try {
-            $sede = Sedes::create($request->except('paises_id', 'departamentos_id', 'estrellas', 'rating_precios', 'categorias'));
-            $sede->categorias()->sync($request->categorias ?? []);
-            \DB::commit();
-
-            return new SedesResource($sede);
-        } catch (\Exception $ex) {
-            \DB::rollBack();
-
-            return response()->json([
-                'sede' => 'Error al guardar',
-                'error' => $ex->getMessage(),
-            ], 500);
-        }
-        // return new SedesResource( $sede );
+        return new SedesResource($sede);
     }
 
     /**
@@ -38,7 +24,7 @@ class SedesController extends Controller
      */
     public function show(Sedes $sede)
     {
-        $sede->load('ciudad.state.country', 'categorias');
+        $sede->load('ciudad.state.country', 'comercio');
 
         return new SedesResource($sede);
     }
@@ -48,22 +34,9 @@ class SedesController extends Controller
      */
     public function update(Request $request, Sedes $sede)
     {
-        \DB::beginTransaction();
+        $sede->update($request->except('paises_id', 'departamentos_id', 'estrellas', 'rating_precios'));
 
-        try {
-            $sede->update($request->except('paises_id', 'departamentos_id', 'estrellas', 'rating_precios', 'categorias'));
-            $sede->categorias()->sync($request->categorias ?? []);
-            \DB::commit();
-
-            return new SedesResource($sede);
-        } catch (\Exception $ex) {
-            \DB::rollBack();
-
-            return response()->json([
-                'sede' => 'Error al guardar',
-                'error' => $ex->getMessage(),
-            ], 500);
-        }
+        return new SedesResource($sede);
     }
 
     /**
@@ -91,8 +64,6 @@ class SedesController extends Controller
             $sede2 = $sede->replicate(['estrellas', 'rating_precios']);
             $sede2->sede = "{$sede->sede} - Copia";
             $sede2->save();
-
-            $sede2->categorias()->sync($sede->categorias->pluck('id'));
 
             foreach ($sede->redes_sociales ?? [] as $red) {
                 $newRed = $red->replicate();

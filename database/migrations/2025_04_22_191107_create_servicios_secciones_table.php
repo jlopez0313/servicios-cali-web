@@ -10,11 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('sedes_categorias', function (Blueprint $table) {
+        Schema::create('servicios_secciones', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('sedes_id')->constrained('sedes');
-            $table->foreignId('categorias_id')->constrained('categorias');
+            $table->foreignId('servicios_id')->constrained('servicios');
+            $table->foreignId('secciones_id')->constrained('secciones');
 
             $table->timestamps();
             $table->softDeletes();
@@ -26,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sedes_categorias');
+        Schema::dropIfExists('servicios_secciones');
     }
 };

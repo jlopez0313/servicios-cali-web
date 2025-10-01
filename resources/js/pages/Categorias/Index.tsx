@@ -82,13 +82,13 @@ export default ({ auth, filters, lista, roles }: any) => {
             <Pagination links={links} />
             <Modal show={show} closeable={true} title="Gestionar Categorias">
                 <Form
-                    roles={roles}
-                    setIsOpen={onToggleModal}
-                    onReload={onReload}
                     id={id}
+                    roles={roles}
                     processing={processing}
                     onStore={onStore}
+                    onReload={onReload}
                     onGetItem={onGetItem}
+                    setIsOpen={onToggleModal}
                 />
             </Modal>
         </AppLayout>

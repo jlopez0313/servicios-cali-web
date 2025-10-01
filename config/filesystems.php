@@ -55,7 +55,15 @@ return [
             'throw' => false,
         ],
 
-        'uploads_subcategorias' => [
+        'uploads_comercios' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'uploads_secciones' => [
             'driver' => 'local',
             'root' => storage_path('app'),
             'url' => env('APP_URL').'/storage',
@@ -100,7 +108,8 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
         public_path('uploads_categorias') => storage_path('app/uploads_categorias'),
-        public_path('uploads_subcategorias') => storage_path('app/uploads_subcategorias'),
+        public_path('uploads_comercios') => storage_path('app/uploads_comercios'),
+        public_path('uploads_secciones') => storage_path('app/uploads_secciones'),
         public_path('uploads_servicios') => storage_path('app/uploads_servicios'),
     ],
 

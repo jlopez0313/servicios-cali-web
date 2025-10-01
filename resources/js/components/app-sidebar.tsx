@@ -1,7 +1,8 @@
 import { index as categorias } from '@/actions/App/Http/Controllers/CategoriasController';
+import { index as comercios } from '@/actions/App/Http/Controllers/ComerciosController';
+import { index as faq } from '@/actions/App/Http/Controllers/FaqController';
+import { index as secciones } from '@/actions/App/Http/Controllers/SeccionesController';
 import { index as sedes } from '@/actions/App/Http/Controllers/SedesController';
-import { index as servicios } from '@/actions/App/Http/Controllers/ServiciosController';
-import { index as subcategorias } from '@/actions/App/Http/Controllers/SubcategoriasController';
 import { index as usuarios } from '@/actions/App/Http/Controllers/UsuariosController';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -10,7 +11,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Briefcase, LayoutGrid, Store, Tag, Tags, Users } from 'lucide-react';
+import { Building2, HelpCircle, LayoutGrid, Store, Tag, Tags, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -32,22 +33,28 @@ const mainNavItems: NavItem[] = [
         icon: Tag,
     },
     {
+        title: 'Comercios',
+        href: comercios(),
+        roles:['admin', 'proveedor'],
+        icon: Building2,
+    },
+    {
+        title: 'Secciones',
+        href: secciones(),
+        roles:['admin'],
+        icon: Tags,
+    },
+    {
         title: 'Sedes',
         href: sedes(),
         roles:['admin', 'proveedor'],
         icon: Store,
     },
     {
-        title: 'Secciones',
-        href: subcategorias(),
-        roles:['admin'],
-        icon: Tags,
-    },
-    {
-        title: 'Servicios',
-        href: servicios(),
-        roles:['admin'],
-        icon: Briefcase,
+        title: 'Preguntas Frecuentes',
+        href: faq(),
+        roles:['admin', 'proveedor'],
+        icon: HelpCircle,
     },
 ];
 

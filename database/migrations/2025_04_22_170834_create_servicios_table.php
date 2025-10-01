@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('servicios', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('sedes_id')->constrained('sedes');
             $table->foreignId('subcategorias_id')->constrained('subcategorias');
             $table->string('servicio');
             $table->string('url')->nullable();
@@ -20,6 +21,10 @@ return new class extends Migration
             $table->text('descripcion');
             $table->string('imagen');
             $table->string('precio');
+            $table->boolean('es_virtual')->default(false);
+            $table->boolean('a_domicilio')->default(false);
+            $table->boolean('en_sede')->default(false);
+            $table->integer('precio_domicilio');
             $table->timestamps();
             $table->softDeletes();
         });

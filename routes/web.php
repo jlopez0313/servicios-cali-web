@@ -35,23 +35,42 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     ->name('categorias');
             });
 
-            Route::prefix('subcategorias')
+            Route::prefix('comercios')
+            ->controller(App\Http\Controllers\ComerciosController::class)
             ->group(function () {
-                Route::get('/', [App\Http\Controllers\SubcategoriasController::class, 'index'])
-                    ->name('subcategorias');
+                Route::get('/', 'index')
+                    ->name('comercios');
+                Route::get('/crear', 'create');
+                Route::get('/editar/{sede}', 'edit');
+            });
+
+            Route::prefix('secciones')
+            ->group(function () {
+                Route::get('/', [App\Http\Controllers\SeccionesController::class, 'index'])
+                    ->name('secciones');
             });
 
             Route::prefix('servicios')
             ->group(function () {
-                Route::get('/', [App\Http\Controllers\ServiciosController::class, 'index'])
+                Route::get('/create/{sede}', [App\Http\Controllers\ServiciosController::class, 'create'])
+                ->name('servicios.crear');
+                Route::get('/{id}', [App\Http\Controllers\ServiciosController::class, 'index'])
                     ->name('servicios');
+                Route::get('/{id}/edit/{sede}/', [App\Http\Controllers\ServiciosController::class, 'edit'])
+                    ->name('servicios.modificar');
             });
 
-            Route::controller(App\Http\Controllers\ComentariosController::class)
-            ->prefix('comentarios')
+            Route::prefix('comentarios')
+            ->controller(App\Http\Controllers\ComentariosController::class)
             ->group(function () {
                 Route::get('/sedes/{id}', 'index')->defaults('type', 'sedes')->name('comentarios.sede');
-                Route::get('/productos/{id}', 'index')->defaults('type', 'productos')->name('comentarios.producto');
+                Route::get('/servicios/{id}', 'index')->defaults('type', 'servicios')->name('comentarios.servicio');
+            });
+
+            Route::prefix('faq')
+            ->controller(App\Http\Controllers\FaqController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('faq');
             });
         }
     );
@@ -59,3 +78,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+require __DIR__.'/guest.php';

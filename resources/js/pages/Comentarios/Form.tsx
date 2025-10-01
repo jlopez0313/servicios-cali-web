@@ -3,21 +3,21 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import StarRating from '@/components/ui/StarRating';
 import { Textarea } from '@/components/ui/textarea';
-import { show } from '@/routes/comentarios';
+import { showAlert } from '@/plugins/sweetalert';
+import { show, store, update } from '@/routes/comentarios';
 import { useForm } from '@inertiajs/react';
-import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 type ThisForm = {
-    rating: number,
+    rating: number;
     comentario: string;
     respuesta: string;
     aprobado: boolean | 'indeterminate';
 };
 
-export const Form = ({ id, onReload, onClose }: any) => {
-    const { data, setData, post, put, processing, errors, reset } = useForm<Required<ThisForm>>({
+export const Form = ({ id, processing, onStore, onReload, onGetItem, onToggleModal }: any) => {
+    const { data, setData, post, put, errors, reset } = useForm<Required<ThisForm>>({
         rating: 5,
         comentario: '',
         respuesta: '',
@@ -29,40 +29,33 @@ export const Form = ({ id, onReload, onClose }: any) => {
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
 
-        const options = {
-            onSuccess: () => {
-                reset();
-                onClose();
-                onReload();
-            },
-            onError: (errors: any) => {
-                console.log(errors);
-                if (errors.nombre) {
-                    reset('respuesta');
-                }
-            },
-        };
-
-        put(route('comentarios.update', id), options);
-    };
-
-    const onGetItem = async () => {
-        const { data: response } = await axios.get(show(id).url);
-        const item = response.data;
-
-        setData({
-            rating: item?.rating || 5,
-            comentario: item?.comentario || '',
-            respuesta: item?.respuesta?.respuesta || '',
-            aprobado: item?.aprobado == 1 ? true : false,
-        });
-
-        setResetKey(Date.now());
+        try {
+            await onStore(store, update, data);
+            onReload();
+        } catch (error) {
+            console.error(error);
+            showAlert('error', 'No se pudieron registrar algunos datos');
+        }
     };
 
     useEffect(() => {
-        reset();
-        if (id) onGetItem();
+        const getItem = async () => {
+            if (!id) return;
+            const item = await onGetItem(show, { comentario: id });
+
+            if (item) {
+                setData({
+                    rating: item?.rating || 5,
+                    comentario: item?.comentario || '',
+                    respuesta: item?.respuesta?.respuesta || '',
+                    aprobado: item?.aprobado == 1 ? true : false,
+                });
+            }
+
+            setResetKey(Date.now());
+        };
+
+        getItem();
     }, [id]);
 
     return (
@@ -84,25 +77,14 @@ export const Form = ({ id, onReload, onClose }: any) => {
 
                         <div>
                             <Label htmlFor="rating"> Rating </Label>
-                            <StarRating 
-                                readOnly={true}
-                                key={`stars-${resetKey}`}
-                                resetKey={resetKey}
-                                initialRating={data.rating}
-                            />
+                            <StarRating readOnly={true} key={`stars-${resetKey}`} resetKey={resetKey} initialRating={data.rating} />
                         </div>
                         <div>
                             <Label htmlFor="comentario"> Comentario </Label>
 
-                            <Textarea
-                                rows={6}
-                                readOnly={true}
-                                id="comentario"
-                                name="comentario"
-                                required
-                                value={data.comentario}
-                                placeholder="Comentario"
-                            />
+                            <span className="d-block flex h-auto w-full rounded-md border px-3 py-1 text-sm" id="comentario">
+                                {data.comentario}
+                            </span>
 
                             {errors.respuesta && <p className="mt-1 text-sm text-red-500">{errors.respuesta}</p>}
                         </div>
@@ -125,16 +107,7 @@ export const Form = ({ id, onReload, onClose }: any) => {
                     </div>
 
                     <div className="mt-4 flex items-center justify-end">
-                        <Button
-                            variant={'outline'}
-                            className="mx-4 ms-4"
-                            disabled={processing}
-                            type="button"
-                            onClick={() => {
-                                reset();
-                                onClose();
-                            }}
-                        >
+                        <Button variant={'outline'} className="mx-4 ms-4" disabled={processing} type="button" onClick={() => onToggleModal(false)}>
                             Cancelar
                         </Button>
                         <Button disabled={processing}>

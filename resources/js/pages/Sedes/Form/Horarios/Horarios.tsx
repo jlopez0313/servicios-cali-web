@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useCrudPage } from '@/hooks/useCrudPage';
+import { showAlert } from '@/plugins/sweetalert';
 import { show, store } from '@/routes/horarios';
 import { useForm } from '@inertiajs/react';
 import { Copy, LoaderCircle, MinusSquare } from 'lucide-react';
@@ -71,7 +72,12 @@ export const Horarios = ({ sedeId }: any) => {
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
-        onStore(store, null, data);
+        try {
+            onStore(store, null, data);
+        } catch (error) {
+            console.error(error)
+            showAlert('error', 'No se pudieron registrar algunos datos')
+        }
     };
 
     useEffect(() => {

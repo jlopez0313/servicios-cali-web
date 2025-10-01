@@ -24,7 +24,7 @@ class CategoriasController extends Controller
         return Inertia::render('Categorias/Index', [
             'filters' => Peticion::all('search', 'trashed'),
             'lista' => CategoriasResource::collection(
-                $query->paginate(1)->appends($request->all())
+                $query->paginate()->appends($request->all())
             ),
         ]);
     }

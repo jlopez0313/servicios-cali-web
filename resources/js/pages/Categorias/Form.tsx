@@ -2,6 +2,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { showAlert } from '@/plugins/sweetalert';
 import { show, store, update } from '@/routes/categorias';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
@@ -25,11 +26,24 @@ export const Form = ({ id, setIsOpen, onReload, processing, onStore, onGetItem }
 
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
-            formData.append(key, data[key]);
+            const value = data[key as keyof ThisForm];
+
+            if (Array.isArray(value)) {
+                value.forEach((v) => {
+                    formData.append(`${key}[]`, v);
+                });
+            } else {
+                formData.append(key, value as any);
+            }
         });
 
-        await onStore(store, update, formData, true);
-        onReload();
+        try {
+            await onStore(store, update, formData, true);
+            onReload();
+        } catch (error) {
+            console.error(error)
+            showAlert('error', 'No se pudieron registrar algunos datos')
+        }
     };
 
     const onSetPreview = (evt: any) => {
@@ -53,7 +67,7 @@ export const Form = ({ id, setIsOpen, onReload, processing, onStore, onGetItem }
                     imagen: '',
                 });
 
-                setPreview(item.imagen);
+                setPreview('/' + item.imagen);
             }
         };
 

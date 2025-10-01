@@ -2,13 +2,13 @@ import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { Table } from '@/components/ui/Table/Table';
 import { useCrudPage } from '@/hooks/useCrudPage';
-import { destroy, index } from '@/routes/redes';
+import { destroy, sede } from '@/routes/redes';
 import { Edit3, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Form } from './Form';
 
 export const Redes = ({ sedeId }: any) => {
-    const { id: redId, show, onList, onSetItem, onToggleModal, onTrash, processing, onStore, onGetItem } = useCrudPage(null, destroy);
+    const { id: redId, show, onList, onSetItem, onToggleModal, onTrash, processing, onStore, onGetItem, onBack } = useCrudPage(null, destroy);
     const [data, setData] = useState([]);
 
     const onDelete = async (id: number) => {
@@ -21,7 +21,7 @@ export const Redes = ({ sedeId }: any) => {
     };
 
     const onLoad = async () => {
-        const lista = await onList(index, { params: { id: sedeId } });
+        const lista = await onList(sede, { params: { id: sedeId } });
         const data = lista.map((item: any) => {
             return {
                 id: item.id,
@@ -38,7 +38,10 @@ export const Redes = ({ sedeId }: any) => {
 
     return (
         <div className="pt-6 pb-12">
-            <div className="flex w-full items-center justify-end px-4 pt-4">
+            <div className="flex w-full items-center justify-end px-4 pt-4 gap-4">
+                <Button type="button" variant="outline" onClick={onBack} disabled={processing}>
+                    Regresar
+                </Button>
                 <Button type="button" onClick={() => onToggleModal(true)}>
                     Agregar Red
                 </Button>

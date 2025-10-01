@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SelectMultiple } from '@/components/ui/SelectMultiple';
+import { showAlert } from '@/plugins/sweetalert';
 import { show, store, update } from '@/routes/usuarios';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
@@ -44,8 +45,13 @@ export const Form = ({ id, roles, setIsOpen, processing, onStore, onGetItem, onR
             return;
         }
 
-        await onStore(store, update, data);
-        onReload();
+        try {
+            await onStore(store, update, data);
+            onReload();
+        } catch (error) {
+            console.error(error)
+            showAlert('error', 'No se pudieron registrar algunos datos')
+        }
     };
 
     useEffect(() => {

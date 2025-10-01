@@ -2,94 +2,71 @@ import { useEffect, useState } from 'react';
 // import Layout from '@/Components/Layout';
 // import SearchFilter from '@/Shared/SearchFilter';
 
+import { create, edit } from '@/actions/App/Http/Controllers/ServiciosController';
 import { Search } from '@/components/Search/Search';
 import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Table/Pagination';
 import { Table } from '@/components/ui/Table/Table';
 import { toCurrency } from '@/helpers/Numbers';
+import { useCrudPage } from '@/hooks/useCrudPage';
 import AppLayout from '@/layouts/app-layout';
-import { confirmDialog, showAlert } from '@/plugins/sweetalert';
+import { servicio } from '@/routes/comentarios';
 import { destroy } from '@/routes/servicios';
 import { BreadcrumbItem } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
-import { Edit3, Trash2 } from 'lucide-react';
-import { Form } from './Form';
+import { Head, router } from '@inertiajs/react';
+import { Edit3, MessagesSquare, Trash2 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Sedes',
+        href: '/sedes',
+    },
     {
         title: 'Servicios',
         href: '/servicios',
     },
 ];
 
-export default ({ auth, filters, lista, roles }: any) => {
+export default ({ auth, sedesId, filters, lista, roles }: any) => {
     const {
         data,
         meta: { links },
     } = lista;
 
+    const {onTrash, onBack } = useCrudPage(lista, destroy);
+
     const [list, setList] = useState([]);
-    const [id, setId] = useState<number | null>(null);
-    const [show, setShow] = useState(false);
 
-    const currentUrl = usePage().url;
+    const onComment = (id: number) => {
+        router.visit(servicio({id}))
+    }
 
-    const onSetList = () => {
-        const _list = data.map((item: any) => {
-            return {
-                id: item.id,
-                categoria: item.subcategoria?.categoria?.categoria ?? '-',
-                subcategoria: item.subcategoria?.subcategoria ?? '-',
-                servicio: item.servicio ?? '-',
-                whatsapp: item.whatsapp ?? '-',
-                precio: toCurrency(item.precio ?? 0),
-                imagen: <img src={`/${item.imagen}`} style={{maxHeight: '50px'}} />,
-            };
-        });
-
-        setList(_list);
-    };
-
-    const onSetItem = (_id: number) => {
-        setId(_id);
-        onToggleModal(true);
-    };
-
-    const onTrash = async (_id: number) => {
-        const result = await confirmDialog({
-            title: '¿Estás seguro?',
-            text: '¡No podrás revertir esto!',
-            icon: 'warning',
-        });
-
-        if (result.isConfirmed) {
-            try {
-                await axios.delete(destroy({ id: _id }).url);
-                await showAlert('success', 'Registro eliminado');
-                onReload();
-            } catch (error) {
-                showAlert('error', 'Error al eliminar');
-            }
+    const onForm = (id?: number) => {
+        if( id ) {
+            router.visit( edit({id: id, sede: sedesId}).url )
+        } else {
+            router.visit( create({sede: sedesId}).url )
         }
-    };
-
-    const onToggleModal = (isShown: boolean) => {
-        if (!isShown) {
-            setId(null);
-        }
-        setShow(isShown);
-    };
-
-    const onReload = () => {
-        onToggleModal(false);
-
-        router.visit(currentUrl, {
-            preserveScroll: true,
-        });
-    };
+    }
 
     useEffect(() => {
+        const onSetList = () => {
+            const _list = data.map((item: any) => {
+                return {
+                    id: item.id,
+                    comercio: item.sede?.comercio?.nombre ?? '-',
+                    sede: item.sede?.sede ?? '-',
+                    secciones: item.secciones?.map((s: any) => s.seccion).join(', ') ?? '-',
+                    servicio: item.servicio ?? '-',
+                    whatsapp: item.whatsapp ?? '-',
+                    precio: toCurrency(item.precio ?? 0),
+                    imagen: <img src={`/${item.imagen}`} style={{ maxHeight: '50px' }} />,
+                };
+            });
+
+            setList(_list);
+        };
+
         onSetList();
     }, []);
 
@@ -99,20 +76,27 @@ export default ({ auth, filters, lista, roles }: any) => {
 
             <div className="flex items-end justify-between px-4 pt-4">
                 <Search filters={filters} ruta="servicios" />
-                <Button className="ms-4" onClick={() => onToggleModal(true)}>
-                    Agregar
-                </Button>
+                <div className="flex gap-4">
+                    <Button variant={'outline'} onClick={onBack}>
+                        {' '}
+                        Regresar{' '}
+                    </Button>
+                    <Button className="ms-4" onClick={() => onForm()}>
+                        Agregar
+                    </Button>
+                </div>
             </div>
 
             <div className="mt-8 overflow-x-auto px-4">
                 <Table
                     user={auth.user}
                     data={list}
-                    titles={['Categoría', 'SubCategoría', 'Servicio', 'WhatsApp', 'Precio', 'Imágen']}
+                    titles={['Comercio', 'Sede', 'Secciones', 'Servicio', 'WhatsApp', 'Precio', 'Imágen']}
                     actions={[
+                        { icon: MessagesSquare, action: onComment, title: 'Comentarios' },
                         {
                             icon: Edit3,
-                            action: onSetItem,
+                            action: onForm,
                             title: 'Editar',
                         },
                         {
@@ -125,9 +109,7 @@ export default ({ auth, filters, lista, roles }: any) => {
             </div>
 
             <Pagination links={links} />
-            <Modal show={show} closeable={true} title="Gestionar Servicios">
-                <Form roles={roles} setIsOpen={onToggleModal} onReload={onReload} id={id} />
-            </Modal>
+
         </AppLayout>
     );
 };

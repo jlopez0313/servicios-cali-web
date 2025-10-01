@@ -16,24 +16,26 @@ class Sedes extends Model
     protected $guarded = [];
 
     protected $fillable = [
+        'comercios_id',
         'ciudades_id',
         'sede',
         'direccion',
         'latitud',
         'longitud',
         'numero',
+        'estado',
     ];
 
-    protected $appends = ['estrellas', 'rating'];
+    protected $appends = ['estrellas', 'rating', 'estado_label'];
 
+    public function comercio()
+    {
+        return $this->belongsTo(Comercios::class, 'comercios_id', 'id');
+    }
+    
     public function ciudad()
     {
         return $this->belongsTo(City::class, 'ciudades_id', 'id');
-    }
-
-    public function categorias()
-    {
-        return $this->belongsToMany(Categorias::class, 'sedes_categorias', 'sedes_id', 'categorias_id');
     }
 
     public function comentarios()
@@ -53,24 +55,32 @@ class Sedes extends Model
 
     public function getEstrellasAttribute()
     {
-        $promedio = $this->comentarios()->avg('rating');
+        $promedio = optional($this->comentarios())->avg('rating') ?? 0;
 
         return $promedio ? (int) round((float) $promedio) : 0;
     }
 
     public function getRatingAttribute()
     {
-        $promedio = $this->productos->avg('rating');
+        $promedio = optional($this->productos)->avg('rating') ?? 0;
 
         return $promedio ? (int) round($promedio) : 0;
     }
 
     public function scopeForCurrentUser($query)
     {
-        if (\Auth::user()->hasRole('comercio')) {
-            return $query->where('users_id', \Auth::user()->id);
+        if (\Auth::user()->hasRole('proveedor')) {
+            return $query->where('comercios_id', \Auth::user()->comercio->id);
         }
 
         return $query;
+    }
+
+    public function getEstadoLabelAttribute()
+    {
+        $estados = config('constants.estados');
+        $estado = collect($estados)->first(fn($item) => $item['key'] == $this->estado);
+
+        return $estado['valor'] ?? 'A';
     }
 }

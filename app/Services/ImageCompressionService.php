@@ -21,6 +21,7 @@ class ImageCompressionService
         $sizeInKB = round($sizeInBytes / 1024, 2);
 
         $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
+        
         $filename = uniqid() . '_compressed.' . $extension;
         $fullPath = storage_path("{$savePath}{$filename}");
 
@@ -45,8 +46,8 @@ class ImageCompressionService
      */
     public function compressImage($image, $path) 
     {
-
         $extension = $image->getClientOriginalExtension();
+
         $filename = uniqid() . '_compressed.' . $extension;
         $fullPath = storage_path("{$path}{$filename}");
         $sizeInKB = $image->getSize() / 1024;
@@ -73,7 +74,8 @@ class ImageCompressionService
      */
     public function compressBase64($image_64, $path) 
     {
-        $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
+        $extension = explode('/', \Str::between($image_64, 'data:', ';') )[1];
+        
         $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
         $image = str_replace($replace, '', $image_64);
         $image = str_replace(' ', '+', $image);

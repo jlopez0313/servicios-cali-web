@@ -23,6 +23,16 @@ export function MultiSelect({ selected, placeholder, onChange, options }: Props)
         }
     };
 
+    const allSelected = selected.length === options.length;
+
+    const toggleAll = () => {
+        if (allSelected) {
+            onChange([]); // deselecciona todo
+        } else {
+            onChange(options.map(o => o.value)); // selecciona todo
+        }
+    };
+
     const selectedLabels = options
         .filter(option => selected.includes(option.value))
         .map(option => option.label);
@@ -30,15 +40,25 @@ export function MultiSelect({ selected, placeholder, onChange, options }: Props)
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full flex justify-start ">
+                <Button variant="outline" className="w-full flex justify-start">
                     {selected.length === 0
                         ? placeholder
-                        : selectedLabels.join(", ")}
+                        : (allSelected ? "Todos seleccionados" : selectedLabels.join(", "))}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-                align="start"
-            >
+            <DropdownMenuContent align="start">
+                {/* Seleccionar todos */}
+                <DropdownMenuItem
+                    onClick={toggleAll}
+                    className="flex items-center justify-between font-medium"
+                >
+                    Seleccionar todos
+                    {allSelected && <Check className="w-4 h-4" />}
+                </DropdownMenuItem>
+
+                <div className="h-px bg-gray-200 my-1" />
+
+                {/* Opciones individuales */}
                 {options.map(({ value, label }) => (
                     <DropdownMenuItem
                         key={value}

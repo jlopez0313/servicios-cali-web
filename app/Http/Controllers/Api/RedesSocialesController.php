@@ -3,25 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RedesResource;
 use App\Models\RedesSociales;
 use Illuminate\Http\Request;
 
 class RedesSocialesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        $redes = RedesSociales::where('sedes_id', $request->id)->get();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'OK',
-            'data' => $redes,
-        ]);
-    }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -70,5 +57,21 @@ class RedesSocialesController extends Controller
     public function destroy(RedesSociales $rede)
     {
         $rede->delete();
+    }
+
+
+    public function bySede(Request $request)
+    {
+        return RedesResource::collection(
+            RedesSociales::where('sedes_id', $request->id)->get()
+        );
+    }
+
+
+    public function byComercio(Request $request)
+    {
+        return RedesResource::collection(
+            RedesSociales::where('comercios_id', $request->comercio)->get()
+        );
     }
 }

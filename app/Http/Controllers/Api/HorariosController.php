@@ -60,7 +60,7 @@ class HorariosController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'Horarios actualizados');
+        return response()->json([], 201);
     }
 
     /**
@@ -90,6 +90,12 @@ class HorariosController extends Controller
     public function update(Request $request, Horarios $horario)
     {
         $horario->update($request->all());
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'OK',
+            'data' => $horario,
+        ]);
     }
 
     /**

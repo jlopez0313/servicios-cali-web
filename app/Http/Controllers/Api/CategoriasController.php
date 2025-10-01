@@ -69,7 +69,7 @@ class CategoriasController extends Controller
 
             return new CategoriasResource($categoria);
         } catch (\Exception $ex) {
-            return $ex->getMessage();
+            return response()->json([$ex->getMessage()], 400);
         }
     }
 

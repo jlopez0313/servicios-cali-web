@@ -1,0 +1,19 @@
+.list-item {
+    a {
+        font-weight: bold;
+        min-height: 48px;
+        display: flex;
+        -webkit-box-pack: justify;
+        justify-content: space-between;
+        -webkit-box-align: center;
+        align-items: center;
+        padding: 0px 32px 0px 13px;
+        cursor: pointer;
+        position: relative;
+        border-left: calc(8px) solid transparent;
+
+        &[data-active="true"] {
+            background: none;
+        }
+    }
+}
